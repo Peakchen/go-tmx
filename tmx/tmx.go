@@ -206,7 +206,7 @@ func (d *Data) decodeCSV() (data []GID, err error) {
 	return gids, err
 }
 
-func (m *Map) decodeLayerXML(l *Layer) (gids []GID, err error) {
+func (m *Map) DecodeLayerXML(l *Layer) (gids []GID, err error) {
 	if len(l.Data.DataTiles) != m.Width*m.Height {
 		return []GID{}, InvalidDecodedDataLen
 	}
@@ -219,7 +219,7 @@ func (m *Map) decodeLayerXML(l *Layer) (gids []GID, err error) {
 	return gids, nil
 }
 
-func (m *Map) decodeLayerCSV(l *Layer) ([]GID, error) {
+func (m *Map) DecodeLayerCSV(l *Layer) ([]GID, error) {
 	gids, err := l.Data.decodeCSV()
 	if err != nil {
 		return []GID{}, err
@@ -232,7 +232,7 @@ func (m *Map) decodeLayerCSV(l *Layer) ([]GID, error) {
 	return gids, nil
 }
 
-func (m *Map) decodeLayerBase64(l *Layer) ([]GID, error) {
+func (m *Map) DecodeLayerBase64(l *Layer) ([]GID, error) {
 	dataBytes, err := l.Data.decodeBase64()
 	if err != nil {
 		return []GID{}, err
@@ -260,23 +260,23 @@ func (m *Map) decodeLayerBase64(l *Layer) ([]GID, error) {
 	return gids, nil
 }
 
-func (m *Map) decodeLayer(l *Layer) ([]GID, error) {
+func (m *Map) DecodeLayer(l *Layer) ([]GID, error) {
 	switch l.Data.Encoding {
 	case "csv":
-		return m.decodeLayerCSV(l)
+		return m.DecodeLayerCSV(l)
 	case "base64":
-		return m.decodeLayerBase64(l)
+		return m.DecodeLayerBase64(l)
 	case "": // XML "encoding"
-		return m.decodeLayerXML(l)
+		return m.DecodeLayerXML(l)
 	}
 	return []GID{}, UnknownEncoding
 }
 
-func (m *Map) decodeLayers() (err error) {
+func (m *Map) DecodeLayers() (err error) {
 	for i := 0; i < len(m.Layers); i++ {
 		l := &m.Layers[i]
 		var gids []GID
-		if gids, err = m.decodeLayer(l); err != nil {
+		if gids, err = m.DecodeLayer(l); err != nil {
 			return err
 		}
 
@@ -357,7 +357,7 @@ func Read(r io.Reader) (*Map, error) {
 		return nil, err
 	}
 
-	err := m.decodeLayers()
+	err := m.DecodeLayers()
 	if err != nil {
 		return nil, err
 	}
